@@ -57,7 +57,7 @@ export default class AssignmentItemDivV2 extends React.Component<AssignmentData,
   }
 
   private openDetailsInDialog(){
-    window.open(`https://teams.microsoft.com/l/entity/66aeee93-507d-479a-a3ef-8f494af43945/classroom?context=%7B%22subEntityId%22%3A%22%7B%5C%22version%5C%22%3A%5C%221.0%5C%22,%5C%22config%5C%22%3A%7B%5C%22classes%5C%22%3A%5B%7B%5C%22id%5C%22%3A%5C%22${this.props.teamData.GroupId}%5C%22,%5C%22displayName%5C%22%3A%5C%22AssignmentsCalendar%5C%22,%5C%22assignmentIds%5C%22%3A%5B%5C%22${this.props.assignment.id}%5C%22%5D%7D%5D%7D,%5C%22action%5C%22%3A%5C%22navigate%5C%22,%5C%22view%5C%22%3A%5C%22assignment-viewer%5C%22%7D%22,%22channelId%22%3Anull%7D`,"_blank");
+    window.open(`https://teams.microsoft.com/l/entity/66aeee93-507d-479a-a3ef-8f494af43945/classroom?context=%7B%22subEntityId%22%3A%22%7B%5C%22version%5C%22%3A%5C%221.0%5C%22,%5C%22config%5C%22%3A%7B%5C%22classes%5C%22%3A%5B%7B%5C%22id%5C%22%3A%5C%22${this.props.assignment.classId}%5C%22,%5C%22displayName%5C%22%3A%5C%22AssignmentsCalendar%5C%22,%5C%22assignmentIds%5C%22%3A%5B%5C%22${this.props.assignment.id}%5C%22%5D%7D%5D%7D,%5C%22action%5C%22%3A%5C%22navigate%5C%22,%5C%22view%5C%22%3A%5C%22assignment-viewer%5C%22%7D%22,%22channelId%22%3Anull%7D`,"_blank");
   }
 
 private truncateString(words:string, num:number){
@@ -96,15 +96,15 @@ public render(): React.ReactElement<AssignmentData> {
           alerticon=<span><Icon iconName="Clock" className={styles.alerticon} />&nbsp;</span>;
         }
     }
-    if(this.props.teamData.SubjectName){
-      subjectInitials=this.props.teamData.SubjectName.substring(0,1);
-      subjectName = this.truncateString(this.props.teamData.SubjectName,8)+" - ";
-    }else if(this.props.teamData.Title){
-      subjectInitials=this.props.teamData.Title.substring(0,1);
-    }
-    if(this.props.teamData.Title){
-      teamTitle = this.truncateString(this.props.teamData.Title,35);
-    }
+    // if(this.props.teamData.SubjectName){
+    //   subjectInitials=this.props.teamData.SubjectName.substring(0,1);
+    //   subjectName = this.truncateString(this.props.teamData.SubjectName,8)+" - ";
+    // }else if(this.props.teamData.Title){
+    //   subjectInitials=this.props.teamData.Title.substring(0,1);
+    // }
+    // if(this.props.teamData.Title){
+    //   teamTitle = this.truncateString(this.props.teamData.Title,35);
+    // }
     // isArchived not returned?
     let classesForItem:string=`${styles.assignmentOuterBlock} cdbassignmentpage${this.props.currentPage.toString()}`;
   return (

@@ -15,7 +15,6 @@ export interface IMyAssignmentsState {
   assignments:AssignmentData[];
   classes:CDBClassTeams[];
   student:boolean;
-  config:CDBConfig;
   refreshTime:string;
   currentPage:number;
   errorCode:string;
@@ -32,7 +31,6 @@ export interface CDBConfig {
 
 export interface AssignmentData {
   assignment:MicrosoftGraph.EducationAssignment;
-  teamData:CDBClassTeams;
   studentSubmissionDateStatus:string;
   currentPage:number;
 }

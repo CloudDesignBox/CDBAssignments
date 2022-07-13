@@ -4,7 +4,7 @@ import { IMyAssignmentsProps,IMyAssignmentsState,AssignmentData,CDBConfig,CDBCla
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as cachingService from "../../../services/cachingService";
 import * as helperFunctions from "../../../services/helperFunctions";
-import AssignmentItemDivV2 from "./AssignmentItemv2";
+import AssignmentItemDivV2 from "./AssignmentItem";
 import * as MicrosoftGraph from '@microsoft/microsoft-graph-types';
 import { MSGraphClient, SPHttpClient } from "@microsoft/sp-http";
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
@@ -19,7 +19,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       assignments:[],
       student:false,
       classes:[],
-      config:null,
       refreshTime:this.helperFunctions.getTimeNow(),
       currentPage:1,
       errorCode:"",
@@ -56,13 +55,11 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   //call from refresh button
   private refreshData(){
     this.cacheCheck=true;
-    let config=null;
     let assignments=[];
     let classes=[];
     let student=false;
     
-    //check cdbconfig
-    this.CDBcachingService.removeCache(`${this.cacheKey()}Config`);
+    //check 
     this.CDBcachingService.removeCache(`${this.cacheKey()}User`);
     this.CDBcachingService.removeCache(`${this.cacheKey()}Classes`);
     this.loadedAssignments=false;
@@ -73,7 +70,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     this.setState({
       assignments:assignments,
       classes:classes,
-      config:config,
       student:student,
       refreshTime:"Loading",
       currentPage:1,
@@ -84,13 +80,12 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   
   private checkCache(){
     this.cacheCheck=true;
-    let config=null;
     let assignments=[];
     let classes=[];
     let student=false;
     let refreshTime="";
     let filteredSubject:string="";
-    //check cdbconfig
+    //check 
     if(this.CDBcachingService.getWithExpiry(`${this.cacheKey()}User`)){
       console.info("cached user loaded");
       student=this.CDBcachingService.getWithExpiry(`${this.cacheKey()}User`);
@@ -112,7 +107,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       this.setState({
         assignments:assignments,
         classes:classes,
-        config:config,
         student:student,
         refreshTime:refreshTime,
         filteredSubject:filteredSubject
@@ -121,44 +115,36 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   }
 
 
-
-  private  getAssignmentsAll(){
-    let classCounter:number=0;
-    this.state.classes.forEach(singleClass => {
-      classCounter++;
-      //limit assignment calls to first 25 classes
-      if(classCounter<25){
-        this.getAssignments(singleClass);
-      }
-    });
+  private getTeamsForMe(){
+    //GET /me/joinedTeams
+    //then match up via ids in items
   }
 
-  private getAssignments(singleClass:CDBClassTeams){
-    //load assignments
+  private getAssignmentsForMe(){
+
     this.props.context.msGraphClientFactory.getClient()
     .then((client2: MSGraphClient) => {
       client2
-        .api(`/education/classes/${singleClass.GroupId}/assignments?$expand=submissions&$top=999`)
+        .api(`/education/me/assignments?$expand=submissions&$top=999`)
         .version("v1.0")
         .get((err2, res2) => {
           if(res2){
             let assignments:MicrosoftGraph.EducationAssignment[] = res2.value;
+            let tempAsssignment:AssignmentData[]=this.state.assignments;
             assignments.forEach(assignment => {
-              let tempAsssignment:AssignmentData[]=this.state.assignments;
+              this.helperFunctions.reportDebug(`Assignment loaded ${assignment.displayName}`);
               tempAsssignment.push({
                 assignment:assignment,
-                teamData:singleClass,
                 studentSubmissionDateStatus:"",
                 currentPage:1
               });
-              this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Assignments`,tempAsssignment);
+            });
+            this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Assignments`,tempAsssignment);
               this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Time`,this.helperFunctions.getTimeNow());
-              this.helperFunctions.reportDebug(`Assignment loaded ${assignment.displayName}`);
               this.setState({ 
                 assignments:tempAsssignment,
                 refreshTime:this.helperFunctions.getTimeNow()
               });
-            });
           }else if(err2){
             console.log("graph error "+err2);
             //not sure this works
@@ -170,7 +156,14 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
           }
         });
       });
+
   }
+
+
+
+
+
+  
 
 
 
@@ -201,7 +194,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       //teacher version
       assignments.forEach(assignment => {
         //check status is live
-        this.helperFunctions.reportDebug(`Assignment ${assignment.assignment.displayName} id: ${assignment.assignment.id} classid: ${assignment.teamData.GroupId}`);
+        this.helperFunctions.reportDebug(`Assignment ${assignment.assignment.displayName} id: ${assignment.assignment.id} classid: ${assignment.assignment.classId}`);
         if((assignment.assignment.status== "assigned" || assignment.assignment.status== "published")){
           //check data is in future
           if(new Date(assignment.assignment.dueDateTime) > new Date() ){
@@ -226,93 +219,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     return sortedAndCleanedData;
   }
 
-
-
-  
-   private loadClassData(items: CDBClassTeams[]):void{
-     let classItems: CDBClassTeams[]=[];
-     let foundStudent:boolean = false;
-     let foundTeacher:boolean = false;
-     let studentFlag:boolean=false;
-     let filteredSubject:string="";
-     //check classes for student
-    items.forEach((item: CDBClassTeams) => {
-      foundTeacher=false;
-      foundStudent=false;
-      let excludeClass:boolean=false;
-      if(item.ClassMembers){
-        //check if user is a student with email
-        if(item.ClassMembers.length>0){
-          let studentemails=item.ClassMembersEmail.split(";");
-          studentemails.forEach(studentemail => {
-            if(studentemail.toLowerCase() == this.props.context.pageContext.user.email.toLowerCase()){
-              foundStudent=true;
-              studentFlag=true;
-            }
-          });
-        }
-        //check if user is a student with email
-        if(item.ClassMembers.length>0){
-          let studentusernames=item.ClassMembers.split(";");
-          studentusernames.forEach(studentusername => {
-            if(studentusername.toLowerCase() == this.props.context.pageContext.user.loginName.toLowerCase()){
-              foundStudent=true;
-              studentFlag=true;
-            }
-          });
-        }   
-      }
-      //check for teacher
-      if(item.ClassTeachers){
-        //check if user is a student with email
-        if(item.ClassTeachers.length>0){
-          let teacheremails=item.ClassTeachers.split(";");
-          teacheremails.forEach(teacheremail => {
-            if(teacheremail.toLowerCase() == this.props.context.pageContext.user.email.toLowerCase() || teacheremail.toLowerCase() == this.props.context.pageContext.user.loginName.toLowerCase()){
-              foundTeacher=true;
-            }
-          });
-        }
-      }
-
-      //check to see if subject site filter exists
-    if(this.props.webPartProps.subjectFilter){
-      excludeClass=true;
-      if(item.SubjectSiteResourcesUrl && item.SubjectName){
-        if(window.location.href.toLowerCase().indexOf(item.SubjectSiteResourcesUrl.toLowerCase())>-1 && (item.SubjectSiteResourcesUrl.toLowerCase().indexOf("/sites/")>-1 || item.SubjectSiteResourcesUrl.toLowerCase().indexOf("/teams/")>-1 )){
-          //extra check to filter out subject codes that start with another subject code e.g. En and ENG
-          //either its the end of the url or the next char is a slash or question mark
-          let nextChar:string=window.location.href.toLowerCase().substring(window.location.href.toLowerCase().indexOf(item.SubjectSiteResourcesUrl.toLowerCase())+item.SubjectSiteResourcesUrl.length,window.location.href.toLowerCase().indexOf(item.SubjectSiteResourcesUrl.toLowerCase())+1+item.SubjectSiteResourcesUrl.length);
-          if(window.location.href.toLowerCase().endsWith(item.SubjectSiteResourcesUrl.toLowerCase()) || nextChar =="/" || nextChar=="?"){
-            excludeClass=false;
-            filteredSubject=item.SubjectName;
-          }
-        }
-      }
-    }
-
-
-    if((foundStudent || foundTeacher)&&!excludeClass){
-        classItems.push(item);
-        this.helperFunctions.reportDebug(`Team loaded ${item.Title} as a teacher or student`);
-      }else{
-        this.helperFunctions.reportDebug(`Warning: Team found ${item.Title} but the logged in user was not listed as a student or teacher.`);
-      }
-      this.helperFunctions.reportDebug(`Student: ${foundStudent}. Teacher: ${foundTeacher}`);
-      
-    });
-    
-    this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}User`,studentFlag);
-    this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Teams`,classItems);
-    this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}filteredSubject`,filteredSubject);
-          
-    //set state
-    this.setState({ 
-      classes:classItems,
-      student:studentFlag,
-      filteredSubject:filteredSubject
-    });
-  }
   
 
 
@@ -361,9 +267,10 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       this.checkCache();
     }
 
-    if(this.state.classes.length > 0 && !this.loadedAssignments){
+    //only load assignments after cache check if assignment length is still empty
+    if(this.cacheCheck && this.state.assignments.length < 1 && !this.loadedAssignments){
       this.loadedAssignments=true;
-      this.getAssignmentsAll();
+      this.getAssignmentsForMe();
     }
 
     //get paging from props
@@ -386,7 +293,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
 
           //need to remove archived teams
           if(this.state.currentPage==currentPage){
-            listv2.push(<AssignmentItemDivV2 assignment={assignment.assignment} teamData={assignment.teamData} studentSubmissionDateStatus={assignment.studentSubmissionDateStatus} currentPage={currentPage} />);
+            listv2.push(<AssignmentItemDivV2 assignment={assignment.assignment} studentSubmissionDateStatus={assignment.studentSubmissionDateStatus} currentPage={currentPage} />);
           }
           //set paging counter
           if(pageCounter==pagingProp){
@@ -406,18 +313,11 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     }
 
     let warning:string="";
-    if(this.state.classes.length>25){
-      warning="Warning - we have detected that you are in over 25 classes. Due to throttling limits, this web part does not support more than 25 requests to graph and therefore it may not show a complete list of assignments.";
-    }
-    if(this.state.classes.length=0){
-      warning="We have not detected any classes that you teach or are a studnet of in class dashboard.";
-    }
+   
     if(this.state.errorCode){
       warning+=this.state.errorCode;
     }
-    if(this.state.classes.length>24){
-      warning="Warning - we have detected that you are in over 24 classes. Due to throttling limits, this web part does not support more than 24 requests to graph and therefore it may not show a complete list of assignments. ";
-    }
+
     //block view
     let viewhtml=(<div>{listv2}</div>);
 
@@ -453,79 +353,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
 
 
 
-
-  // private getTeamsData(){
-  //   this.loadedTeams = true;
-  //   console.log("loading teams");
-  //   let numberofClasses:number=0;
-    
-  //   this.props.context.msGraphClientFactory.getClient()
-  //   .then((client: MSGraphClient) => {
-  //     client
-  //       .api(`/education/me/classes?$top=999`)
-  //       .version("v1.0")
-  //       .get((err, res) => {
-  //         if(res){
-  //             let classes:MicrosoftGraph.EducationClass[] = res.value;
-  //             numberofClasses = classes.length;
-  //             // classes.forEach(singleClass => {
-  //             //   console.log(singleClass.displayName);
-  //             //   // throtting with this so disabled
-  //             //   this.getArchiveStatus(singleClass,numberofClasses);
-  //             //   });
-  //             // 
-  //             this.setState({ 
-  //               classes:classes
-  //             });
-  //           } 
-  //         });
-  //       });
-  // }
-
-
-
-  // private getArchiveStatus(singleClass:MicrosoftGraph.EducationClass,numberofClasses:number){
-  //     console.log(`getting archive status of ${singleClass.displayName}`);
-  //      //check archive status of class
-  //      this.props.context.msGraphClientFactory.getClient()
-  //      .then((client3: MSGraphClient) => {
-  //        client3
-  //          .api(`/teams/${singleClass.id}?$select=IsArchived`)
-  //          .version("v1.0")
-  //          .get((err3, res3) => {
-  //            if(res3){
-  //            let ClassTeam:MicrosoftGraph.Team = res3;
-  //            this.classCount++;
-             
-  //            if(!ClassTeam.isArchived){
-  //              console.log(`found unarchived class team ${singleClass.displayName}`);
-  //              this.tempClasses.push(singleClass);
-  //              //only update state when all classes archive state loaded
-  //              if(this.classCount == numberofClasses){
-  //                this.setState({ 
-  //                  classes:this.tempClasses
-  //                });
-  //              }
-               
-  //            }else{
-  //              console.log(`ignoring archived class team ${singleClass.displayName}`);
-  //            }
-  //          }else{
-  //            console.log(`found unarchived class team ${singleClass.displayName}`);
-  //              this.tempClasses.push(singleClass);
-  //              //only update state when all classes archive state loaded
-  //              if(this.classCount == numberofClasses){
-  //                this.setState({ 
-  //                  classes:this.tempClasses
-  //                });
-  //              }
-  //          }
-  //          });
-  //        });
-  // }
-
-
-  
 
   // private getUserSDSType(){
   //   this.loadedUser=true;
