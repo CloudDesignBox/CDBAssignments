@@ -1,0 +1,16 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.14.0",
+    "libraryName": "cdb-my-assignments-web-part",
+    "libraryId": "ba52cdaf-5cac-4f47-8f20-6115315326b0",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "CDB My Assignments Web Part",
+    "solutionShortDescription": "CDB My Assignments Web Part description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

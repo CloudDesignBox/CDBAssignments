@@ -1,0 +1,107 @@
+@import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
+@import './themes.module.scss';
+
+// :global{
+//   /* fix for scrolling on fabric dialog */
+//   .ms-Dialog-actionsRight{margin-right:0px!important;padding:20px;}
+// }
+
+.myAssignments {
+  .warningbox{
+    color:grey;
+    font-weight: normal;
+  }
+
+  .header{display:block;
+    font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 20px;
+    font-weight: 600;
+    padding-bottom:16px;
+  }
+  .footer{
+    display:block;
+    padding-top:10px;
+    font-size: 12px;
+  }
+
+  .refreshtext{
+    font-size: 12px;
+    vertical-align: top;
+    display: inline-block;
+  }
+  .alerticon{
+    color:red;
+  }
+  .refreshicon{
+    padding-left:2px;
+   }
+   .refreshicon:hover{
+    cursor: pointer;
+  }
+  .assignmentBlock{
+    padding:0px;
+  }
+  .assignmentOuterBlock{
+    display: inline-block;
+    width: 100%;
+    max-width: 340px;
+    border: transparent 1px solid;
+  }
+  .assignmentOuterBlock:hover{
+    cursor: pointer;
+    opacity: 0.8;
+  }
+  .red{
+    color:red;
+  }
+  .black{
+    display:inline;
+  }
+
+  .assignmentIcon{
+    background: $ms-themePrimary;
+	  border-radius: 25px;
+    width:50px;
+    height:50px;
+    margin:10px;
+    padding:10px;
+    float:left;
+    color:#fff;
+    font-size:33px;
+    text-align: center;
+    margin-left:0px;
+    border: $ms-neutralPrimary solid 1px;
+  }
+  .pagingContainer{
+    padding-top:10px;
+    padding-bottom:10px;
+    display: block;
+  }
+  .paging{
+    padding:5px;
+    border: transparent 1px solid;
+  }
+  .paging:hover{
+    cursor: pointer;
+  }
+  .pagingSelected{
+    background: $ms-themePrimary;
+    color:#fff;
+    border: $ms-neutralPrimary 1px solid;
+  }
+  .clear{clear:both;}
+  .assignmentDesc{
+    padding-top:10px;
+    line-height: 1.45;
+  }
+
+  .container {
+    max-width: 700px;
+    margin: 0px auto;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+  }
+
+
+
+}
