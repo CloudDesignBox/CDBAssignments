@@ -36,7 +36,7 @@ My Assignment web part|Tony Phillips (Cloud Design Box Ltd)
 
 Version|Date|Comments
 -------|----|--------
-1.0|July 15, 2022|Initial release
+1.0(https://github.com/CloudDesignBox/CDBAssignments/releases/tag/v1.0.0)|July 15, 2022|Initial release
 
 ## Disclaimer
 
