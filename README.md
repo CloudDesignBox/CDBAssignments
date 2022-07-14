@@ -8,7 +8,10 @@ Please note this requires Microsoft School Data Sync properties to be set includ
 
 <img src="https://github.com/CloudDesignBox/CDBAssignments/blob/main/assignmentwebpart.gif?raw=true" />
 
-The latest downloadable release is in the release section on the right of this GitHub page.
+The latest downloadable release is available here (https://github.com/CloudDesignBox/CDBAssignments/releases/tag/v1.0.0)
+
+## About Cloud Design Box
+We help schools Achieve more by extending Teams, SharePoint and Microsoft 365 with the Cloud Box education solutions. We have lots of free community resources on our blog and website (https://www.clouddesignbox.co.uk/)
 
 ## Prerequisites
 This can only be used in a Microsoft Education tenant using Microsoft School Data Sync to setup classes and memberships.
