@@ -103,11 +103,6 @@ export default class MyAssignmentsWebPart extends BaseClientSideWebPart<IMyAssig
                   showValue:true,  
                   step:1 
                 }),
-                PropertyPaneToggle("subjectFilter", {
-                  label: "Only show classes for this CDB automated subject site",
-                  onText: "On",
-                  offText: "Off",
-                }),
                 PropertyPaneToggle("hideOverDue", {
                   label: "Hide overdue assignments",
                   onText: "On",
@@ -115,6 +110,11 @@ export default class MyAssignmentsWebPart extends BaseClientSideWebPart<IMyAssig
                 }),
                 PropertyPaneToggle("showArchivedTeams", {
                   label: "Show assignments from archived class teams",
+                  onText: "On",
+                  offText: "Off",
+                }),
+                PropertyPaneToggle("subjectFilter", {
+                  label: "Only show classes for this CDB automated subject site",
                   onText: "On",
                   offText: "Off",
                 })

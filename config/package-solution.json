@@ -7,7 +7,6 @@
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
-    "supportsThemeVariants": true,
     "webApiPermissionRequests": [
       {
         "resource": "Microsoft Graph",
