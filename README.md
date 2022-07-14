@@ -11,7 +11,7 @@ Please note this requires Microsoft School Data Sync properties to be set includ
 The latest downloadable release is available here (https://github.com/CloudDesignBox/CDBAssignments/releases/tag/v1.0.0)
 
 ## About Cloud Design Box
-<img src="https://www.clouddesignbox.co.uk/static/logo-493bd038d15459f400d201177233a0d6.svg" style="width:200px;height:auto" />
+<a href=https://www.clouddesignbox.co.uk"><img src="https://www.clouddesignbox.co.uk/static/logo-493bd038d15459f400d201177233a0d6.svg" style="width:200px;height:auto" /></a>
 We help schools Achieve more by extending Teams, SharePoint and Microsoft 365 with the Cloud Box education solutions. We have lots of free community resources on our blog and website (https://www.clouddesignbox.co.uk/)
 
 ## Prerequisites
