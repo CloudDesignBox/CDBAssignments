@@ -6,6 +6,11 @@ Web Part which shows Microsoft Teams Education Assignments aggregated in SharePo
 
 [picture of the solution in action, if possible]
 
+## Prerequisites
+This can only be used in a Microsoft Education tenant using Microsoft School Data Sync to setup classes and memberships.
+Microsoft School Data Sync properties to be set including: Classes, Courses (optional to show course info), primary role of users (teacher or student). 
+Once the solution is installed in the tenant app catalog, you will be required to approve the API delegated permissions as a global administrator.
+
 ## Used SharePoint Framework Version
 
 ![version](https://img.shields.io/badge/version-1.13-green.svg)
@@ -17,10 +22,6 @@ Web Part which shows Microsoft Teams Education Assignments aggregated in SharePo
 
 > Get your own free development tenant by subscribing to [Microsoft 365 developer program](http://aka.ms/o365devprogram)
 
-## Prerequisites
-
-> Any special pre-requisites?
-
 ## Solution
 
 Solution|Author(s)
@@ -31,8 +32,7 @@ My Assignment web part|Tony Phillips (Cloud Design Box Ltd)
 
 Version|Date|Comments
 -------|----|--------
-1.1|March 10, 2021|Update comment
-1.0|January 29, 2021|Initial release
+1.0|July 15, 2022|Initial release
 
 ## Disclaimer
 
