@@ -23,7 +23,6 @@
     "officeFabricIconFontName": "Completed",
     "properties": {
       "pagingValue": 10,
-      "subjectFilter":false,
       "hideOverDue":false,
       "showArchivedTeams":false
     }

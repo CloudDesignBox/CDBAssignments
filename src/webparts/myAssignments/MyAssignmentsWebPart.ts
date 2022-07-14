@@ -112,11 +112,6 @@ export default class MyAssignmentsWebPart extends BaseClientSideWebPart<IMyAssig
                   label: "Show assignments from archived class teams",
                   onText: "On",
                   offText: "Off",
-                }),
-                PropertyPaneToggle("subjectFilter", {
-                  label: "Only show classes for this CDB automated subject site",
-                  onText: "On",
-                  offText: "Off",
                 })
               ]
             }

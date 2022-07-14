@@ -19,7 +19,6 @@ export interface IMyAssignmentsState {
   refreshTime:string;
   currentPage:number;
   errorCode:string;
-  filteredSubject:string;
 }
 
 export interface AssignmentData {
@@ -38,7 +37,6 @@ export interface AssignmentDataItemProps{
 
 export interface IMyAssignmentsWebPartProps {
   pagingValue:number;
-  subjectFilter:boolean;
   hideOverDue:boolean;
   showArchivedTeams:boolean;
 }
