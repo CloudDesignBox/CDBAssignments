@@ -19,10 +19,13 @@
     "groupId": "5c03119e-3074-46fd-976b-c60198311f70", // Other
     "group": { "default": "Other" },
     "title": { "default": "My Assignments" },
-    "description": { "default": "My Assignments description" },
-    "officeFabricIconFontName": "Page",
+    "description": { "default": "Show Teams education assignments. This is a Beta web part not yet fully supported." },
+    "officeFabricIconFontName": "Completed",
     "properties": {
-      "description": "My Assignments"
+      "pagingValue": 10,
+      "subjectFilter":false,
+      "hideOverDue":false,
+      "showArchivedTeams":false
     }
   }]
 }

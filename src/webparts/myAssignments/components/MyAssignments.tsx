@@ -1,12 +1,12 @@
 import * as React from 'react';
 import styles from './MyAssignments.module.scss';
-import { IMyAssignmentsProps,IMyAssignmentsState,AssignmentData,CDBConfig,CDBClassTeams} from './IMyAssignmentsProps';
+import { IMyAssignmentsProps,IMyAssignmentsState,AssignmentData} from './IMyAssignmentsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as cachingService from "../../../services/cachingService";
 import * as helperFunctions from "../../../services/helperFunctions";
 import AssignmentItemDivV2 from "./AssignmentItem";
 import * as MicrosoftGraph from '@microsoft/microsoft-graph-types';
-import { MSGraphClient, SPHttpClient } from "@microsoft/sp-http";
+import { MSGraphClient, } from "@microsoft/sp-http";
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 //theme 
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
@@ -17,8 +17,9 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     super(props);
     this.state={
       assignments:[],
+      teams:[],
+      courses:[],
       student:false,
-      classes:[],
       refreshTime:this.helperFunctions.getTimeNow(),
       currentPage:1,
       errorCode:"",
@@ -32,6 +33,9 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   private CDBcachingService: cachingService.cachingService = new cachingService.cachingService(7200000);
   private helperFunctions: helperFunctions.helperFunctions = new helperFunctions.helperFunctions();
   private loadedAssignments:boolean = false;
+  private loadedTeams:boolean=false;
+  private loadedCourses:boolean=false;
+  private loadedUserType:boolean=false;
   private cacheCheck:boolean=false;
 
   private cacheKey():string{
@@ -56,20 +60,26 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   private refreshData(){
     this.cacheCheck=true;
     let assignments=[];
-    let classes=[];
+    let teams=[];
+    let courses=[];
     let student=false;
     
     //check 
     this.CDBcachingService.removeCache(`${this.cacheKey()}User`);
-    this.CDBcachingService.removeCache(`${this.cacheKey()}Classes`);
+    this.CDBcachingService.removeCache(`${this.cacheKey()}Teams`);
+    this.CDBcachingService.removeCache(`${this.cacheKey()}Courses`);
     this.loadedAssignments=false;
+    this.loadedTeams=false;
+    this.loadedCourses=false;
+    this.loadedUserType=false;
     this.CDBcachingService.removeCache(`${this.cacheKey()}Assignments`);
     this.CDBcachingService.removeCache(`${this.cacheKey()}filteredSubject`);
     console.log("cache cleared");
     //update state
     this.setState({
       assignments:assignments,
-      classes:classes,
+      teams:teams,
+      courses:courses,
       student:student,
       refreshTime:"Loading",
       currentPage:1,
@@ -81,7 +91,8 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   private checkCache(){
     this.cacheCheck=true;
     let assignments=[];
-    let classes=[];
+    let teams=[];
+    let courses=[];
     let student=false;
     let refreshTime="";
     let filteredSubject:string="";
@@ -95,6 +106,16 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       this.loadedAssignments=true;
       assignments=this.CDBcachingService.getWithExpiry(`${this.cacheKey()}Assignments`);
     }
+    if(this.CDBcachingService.getWithExpiry(`${this.cacheKey()}Teams`)){
+      console.info("cached teams loaded");
+      this.loadedTeams=true;
+      teams=this.CDBcachingService.getWithExpiry(`${this.cacheKey()}Teams`);
+    }
+    if(this.CDBcachingService.getWithExpiry(`${this.cacheKey()}Courses`)){
+      console.info("cached courses loaded");
+      this.loadedCourses=true;
+      courses=this.CDBcachingService.getWithExpiry(`${this.cacheKey()}Courses`);
+    }
     if(this.CDBcachingService.getWithExpiry(`${this.cacheKey()}Time`)){
       console.info("cached time loaded");
       refreshTime=this.CDBcachingService.getWithExpiry(`${this.cacheKey()}Time`);
@@ -106,7 +127,8 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       //update state
       this.setState({
         assignments:assignments,
-        classes:classes,
+        teams:teams,
+        courses:courses,
         student:student,
         refreshTime:refreshTime,
         filteredSubject:filteredSubject
@@ -115,9 +137,98 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   }
 
 
+  private getUserSDSType(){
+    this.props.context.msGraphClientFactory.getClient()
+    .then((client: MSGraphClient) => {
+      client
+        .api(`/education/me`)
+        .version("v1.0")
+        .select("primaryRole")
+        .get((err, res) => {
+          if(res){
+            let user:MicrosoftGraph.EducationUser= res;
+            if (user.primaryRole =="student"){
+              this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}User`,true);
+              this.setState({ 
+                student:true
+              });
+            }else{
+              this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}User`,false);
+            }
+
+          }else if(err){
+            console.log("graph error "+err);
+            //not sure this works
+            if(err.toString().indexOf("InteractionRequiredAuthError")!=-1){
+              this.setState({ 
+                errorCode:`Warning - To use this web part, your SharePoint admin must accept the graph API permissions in the SharePoint admin centre https://${window.location.host.split(".")[0]}-admin.sharepoint.com/_layouts/15/online/AdminHome.aspx#/webApiPermissionManagement. Please log a support ticket with Cloud Design Box if you need further assistance.`
+              });
+            }
+          }
+        });
+      });
+  }
+
+
   private getTeamsForMe(){
-    //GET /me/joinedTeams
+    //GET 
     //then match up via ids in items
+    this.props.context.msGraphClientFactory.getClient()
+    .then((client2: MSGraphClient) => {
+      client2
+        .api(`/me/joinedTeams`)
+        .select("displayName,id,isArchived")
+        .version("v1.0")
+        .get((err2, res2) => {
+          if(res2){
+            let teams:MicrosoftGraph.Team[]= res2.value;
+            this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Teams`,teams);
+              this.setState({ 
+                teams:teams
+              });
+          }else if(err2){
+            console.log("graph error "+err2);
+            //not sure this works
+            if(err2.toString().indexOf("InteractionRequiredAuthError")!=-1){
+              this.setState({ 
+                errorCode:`Warning - To use this web part, your SharePoint admin must accept the graph API permissions in the SharePoint admin centre https://${window.location.host.split(".")[0]}-admin.sharepoint.com/_layouts/15/online/AdminHome.aspx#/webApiPermissionManagement. Please log a support ticket with Cloud Design Box if you need further assistance.`
+              });
+            }
+          }
+        });
+      });
+
+  }
+
+  private getCoursesForMe(){
+    //GET 
+    //then match up via ids in items
+    this.props.context.msGraphClientFactory.getClient()
+    .then((client2: MSGraphClient) => {
+      client2
+        .api(`/education/me/classes`)
+        .select("id,course,displayName")
+        .version("v1.0")
+        .top(999)
+        .get((err2, res2) => {
+          if(res2){
+            let courses:MicrosoftGraph.EducationClass[]= res2.value;
+            this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Courses`,courses);
+              this.setState({ 
+                courses:courses
+              });
+          }else if(err2){
+            console.log("graph error "+err2);
+            //not sure this works
+            if(err2.toString().indexOf("InteractionRequiredAuthError")!=-1){
+              this.setState({ 
+                errorCode:`Warning - To use this web part, your SharePoint admin must accept the graph API permissions in the SharePoint admin centre https://${window.location.host.split(".")[0]}-admin.sharepoint.com/_layouts/15/online/AdminHome.aspx#/webApiPermissionManagement. Please log a support ticket with Cloud Design Box if you need further assistance.`
+              });
+            }
+          }
+        });
+      });
+
   }
 
   private getAssignmentsForMe(){
@@ -136,7 +247,8 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
               tempAsssignment.push({
                 assignment:assignment,
                 studentSubmissionDateStatus:"",
-                currentPage:1
+                currentPage:1,
+                subjectName:""
               });
             });
             this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Assignments`,tempAsssignment);
@@ -158,15 +270,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       });
 
   }
-
-
-
-
-
-  
-
-
-
 
   private sortClassesArray(assignments:AssignmentData[]):AssignmentData[]{
     let sortedAndCleanedData:AssignmentData[]=[];
@@ -273,6 +376,21 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       this.getAssignmentsForMe();
     }
 
+    if(this.cacheCheck && this.state.teams.length < 1 && !this.loadedTeams){
+      this.loadedTeams=true;
+      this.getTeamsForMe();
+    }
+
+    if(this.cacheCheck && this.state.courses.length < 1 && !this.loadedCourses){
+      this.loadedCourses=true;
+      this.getCoursesForMe();
+    }
+
+    if(this.cacheCheck && !this.loadedUserType){
+      this.loadedUserType=true;
+      this.getUserSDSType();
+    }
+
     //get paging from props
     let pagingProp:number=10; //default if not set
     if(this.props.webPartProps.pagingValue){
@@ -284,29 +402,51 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     let pageCounter:number=1;
     let currentPage:number=1;
     const pages=[<span className={styles.paging} onClick={(e) => this.updatePaging(e)} data-pagenumber={currentPage}>{currentPage.toString()}</span>];
-    if(this.state.assignments.length > 0){
+    if(this.state.assignments.length > 0 && this.state.teams.length > 0 && this.state.courses.length > 0){
       let sortedAssignments:AssignmentData[]=this.sortClassesArray(this.state.assignments);
       sortedAssignments.forEach(assignment => {
 
+        let teamName:string="";
+        let archivedState:boolean=false;
+        let courseName:string="";
+        let subject:string="";
+
+        //get team name from list of teams
+        this.state.teams.forEach(team => {
+          if(team.id == assignment.assignment.classId){
+            teamName=team.displayName;
+            archivedState=team.isArchived;
+          }
+        });
+
+        //get course name from list of teams
+        this.state.courses.forEach(course => {
+          if(course.id == assignment.assignment.classId){
+            courseName=course.course.displayName;
+            subject=course.course.subject;
+          }
+        });
+
         //show all outstanding assignments or hide overdue if set in the web part props
         if((this.props.webPartProps.hideOverDue && assignment.studentSubmissionDateStatus != "overdue")||!this.props.webPartProps.hideOverDue){
+          //only show archived teams
+          if((this.props.webPartProps.showArchivedTeams && archivedState) || !archivedState){
 
-          //need to remove archived teams
-          if(this.state.currentPage==currentPage){
-            listv2.push(<AssignmentItemDivV2 assignment={assignment.assignment} studentSubmissionDateStatus={assignment.studentSubmissionDateStatus} currentPage={currentPage} />);
-          }
-          //set paging counter
-          if(pageCounter==pagingProp){
-            pageCounter=1;
-            currentPage++;
-            pages.push(<span className={styles.paging} onClick={(e) => this.updatePaging(e)} data-pagenumber={currentPage}>{currentPage.toString()}</span>);
-          }else{
-            pageCounter++;
-          }
+            //need to remove archived teams
+            if(this.state.currentPage==currentPage){
+              listv2.push(<AssignmentItemDivV2 itemData={assignment} teamName={teamName} course={courseName} subject={subject} />);
+            }
+            //set paging counter
+            if(pageCounter==pagingProp){
+              pageCounter=1;
+              currentPage++;
+              pages.push(<span className={styles.paging} onClick={(e) => this.updatePaging(e)} data-pagenumber={currentPage}>{currentPage.toString()}</span>);
+            }else{
+              pageCounter++;
+            }
 
+          }
         }
-        
-
       });
     }else{
       listv2.push("No assignments found");
@@ -354,24 +494,4 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
 
 
 
-  // private getUserSDSType(){
-  //   this.loadedUser=true;
-  //   console.log("loading teams");
-  //   this.props.context.msGraphClientFactory.getClient()
-  //   .then((client: MSGraphClient) => {
-  //     client
-  //       .api(`/education/me`)
-  //       .version("v1.0")
-  //       .get((err, res) => {
-  //         if(res){
-  //             let user:MicrosoftGraph.EducationUser = res;
-  //             if (user.primaryRole =="student"){
-  //               this.setState({ 
-  //                 user:user
-  //               });
-  //             }
-  //         }
-  //       });
-  //     });
 
-  // }

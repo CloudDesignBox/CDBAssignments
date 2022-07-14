@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack';
-import { AssignmentData } from './IMyAssignmentsProps';
+import { AssignmentDataItemProps } from './IMyAssignmentsProps';
 import styles from './MyAssignments.module.scss';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
 const stackTokens: Partial<IStackTokens> = { childrenGap: 20 };
 
 
-export default class AssignmentItemDivV2 extends React.Component<AssignmentData, {}> {
+export default class AssignmentItemDivV2 extends React.Component<AssignmentDataItemProps, {}> {
 
   
   constructor(props){
@@ -57,7 +57,7 @@ export default class AssignmentItemDivV2 extends React.Component<AssignmentData,
   }
 
   private openDetailsInDialog(){
-    window.open(`https://teams.microsoft.com/l/entity/66aeee93-507d-479a-a3ef-8f494af43945/classroom?context=%7B%22subEntityId%22%3A%22%7B%5C%22version%5C%22%3A%5C%221.0%5C%22,%5C%22config%5C%22%3A%7B%5C%22classes%5C%22%3A%5B%7B%5C%22id%5C%22%3A%5C%22${this.props.assignment.classId}%5C%22,%5C%22displayName%5C%22%3A%5C%22AssignmentsCalendar%5C%22,%5C%22assignmentIds%5C%22%3A%5B%5C%22${this.props.assignment.id}%5C%22%5D%7D%5D%7D,%5C%22action%5C%22%3A%5C%22navigate%5C%22,%5C%22view%5C%22%3A%5C%22assignment-viewer%5C%22%7D%22,%22channelId%22%3Anull%7D`,"_blank");
+    window.open(`https://teams.microsoft.com/l/entity/66aeee93-507d-479a-a3ef-8f494af43945/classroom?context=%7B%22subEntityId%22%3A%22%7B%5C%22version%5C%22%3A%5C%221.0%5C%22,%5C%22config%5C%22%3A%7B%5C%22classes%5C%22%3A%5B%7B%5C%22id%5C%22%3A%5C%22${this.props.itemData.assignment.classId}%5C%22,%5C%22displayName%5C%22%3A%5C%22AssignmentsCalendar%5C%22,%5C%22assignmentIds%5C%22%3A%5B%5C%22${this.props.itemData.assignment.id}%5C%22%5D%7D%5D%7D,%5C%22action%5C%22%3A%5C%22navigate%5C%22,%5C%22view%5C%22%3A%5C%22assignment-viewer%5C%22%7D%22,%22channelId%22%3Anull%7D`,"_blank");
   }
 
 private truncateString(words:string, num:number){
@@ -70,7 +70,7 @@ private truncateString(words:string, num:number){
 }
 
 /* eslint-disable react/jsx-no-bind */
-public render(): React.ReactElement<AssignmentData> {
+public render(): React.ReactElement<AssignmentDataItemProps> {
     //validate data
     let displayName:string = "No title";
     let instructions:string = "";
@@ -79,34 +79,39 @@ public render(): React.ReactElement<AssignmentData> {
     let subjectName:string = "";
     let teamTitle:string="";
     let alerticon = <span />;
-    if(this.props.assignment){
-        if(this.props.assignment.dueDateTime){
-            this.cleanDueDate = this.renderFriendlyDateFormat(this.props.assignment.dueDateTime);
+    if(this.props.itemData){
+        if(this.props.itemData.assignment.dueDateTime){
+            this.cleanDueDate = this.renderFriendlyDateFormat(this.props.itemData.assignment.dueDateTime);
         }
-        if(this.props.assignment.displayName){
-            displayName = this.truncateString(this.props.assignment.displayName,20);
+        if(this.props.itemData.assignment.displayName){
+            displayName = this.truncateString(this.props.itemData.assignment.displayName,20);
         }
-        if(this.props.assignment.instructions){
-            if(this.props.assignment.instructions.content){
-            instructions = this.props.assignment.instructions.content;
+        if(this.props.itemData.assignment.instructions){
+            if(this.props.itemData.assignment.instructions.content){
+            instructions = this.props.itemData.assignment.instructions.content;
             }
         }
-        if(this.props.studentSubmissionDateStatus == "overdue"){
+        if(this.props.itemData.studentSubmissionDateStatus == "overdue"){
           statusColour=styles.red;
           alerticon=<span><Icon iconName="Clock" className={styles.alerticon} />&nbsp;</span>;
         }
     }
-    // if(this.props.teamData.SubjectName){
-    //   subjectInitials=this.props.teamData.SubjectName.substring(0,1);
-    //   subjectName = this.truncateString(this.props.teamData.SubjectName,8)+" - ";
-    // }else if(this.props.teamData.Title){
-    //   subjectInitials=this.props.teamData.Title.substring(0,1);
-    // }
-    // if(this.props.teamData.Title){
-    //   teamTitle = this.truncateString(this.props.teamData.Title,35);
-    // }
+
+    if(this.props.course){
+      subjectInitials=this.props.course.substring(0,1);
+      subjectName = this.truncateString(this.props.course,8)+" - ";
+    }else if(this.props.subject){
+      subjectInitials=this.props.subject.substring(0,1);
+      subjectName = this.truncateString(this.props.subject,8)+" - ";
+    }else if(this.props.subject){
+      subjectInitials=this.props.subject.substring(0,1);
+    }
+
+    if(this.props.teamName){
+      teamTitle = this.truncateString(this.props.teamName,35);
+    }
     // isArchived not returned?
-    let classesForItem:string=`${styles.assignmentOuterBlock} cdbassignmentpage${this.props.currentPage.toString()}`;
+    let classesForItem:string=`${styles.assignmentOuterBlock} cdbassignmentpage${this.props.itemData.currentPage.toString()}`;
   return (
 
     <div className={classesForItem}>

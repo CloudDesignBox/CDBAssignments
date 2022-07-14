@@ -10,14 +10,12 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import * as strings from 'MyAssignmentsWebPartStrings';
 import MyAssignments from './components/MyAssignments';
-import { IMyAssignmentsProps } from './components/IMyAssignmentsProps';
+import { IMyAssignmentsWebPartProps,IMyAssignmentsProps } from './components/IMyAssignmentsProps';
 import {
   IReadonlyTheme,ThemeProvider,ThemeChangedEventArgs
 } from '@microsoft/sp-component-base';
 
-export interface IMyAssignmentsWebPartProps {
-  description: string;
-}
+
 
 export default class MyAssignmentsWebPart extends BaseClientSideWebPart<IMyAssignmentsWebPartProps> {
 
@@ -112,6 +110,11 @@ export default class MyAssignmentsWebPart extends BaseClientSideWebPart<IMyAssig
                 }),
                 PropertyPaneToggle("hideOverDue", {
                   label: "Hide overdue assignments",
+                  onText: "On",
+                  offText: "Off",
+                }),
+                PropertyPaneToggle("showArchivedTeams", {
+                  label: "Show assignments from archived class teams",
                   onText: "On",
                   offText: "Off",
                 })

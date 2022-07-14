@@ -17,6 +17,11 @@
         "resource": "Microsoft Graph",
         "scope": "User.Read.All"
       }
+      ,
+      {
+        "resource": "Microsoft Graph",
+        "scope": "EduRoster.ReadBasic"
+      }
     ],
     "developer": {
       "name": "",

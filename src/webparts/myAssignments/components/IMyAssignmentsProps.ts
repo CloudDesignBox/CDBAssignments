@@ -13,7 +13,8 @@ export interface IMyAssignmentsProps {
 
 export interface IMyAssignmentsState {
   assignments:AssignmentData[];
-  classes:CDBClassTeams[];
+  teams:MicrosoftGraph.Team[];
+  courses:MicrosoftGraph.EducationClass[];
   student:boolean;
   refreshTime:string;
   currentPage:number;
@@ -21,45 +22,25 @@ export interface IMyAssignmentsState {
   filteredSubject:string;
 }
 
-export interface CDBConfig {
-  ID:number;
-  classesUrl:string;
-  myClassesList:string;
-  MultiSchoolPath:string;
-}
-
-
 export interface AssignmentData {
   assignment:MicrosoftGraph.EducationAssignment;
   studentSubmissionDateStatus:string;
   currentPage:number;
+  subjectName:string;
 }
 
-export interface CDBClassTeams {
-  ID:number;
-  Title:string;
-  ClassMembers:string;
-  ClassMembersEmail:string;
-  ClassTeachers:string;
-  GroupId:string;
-  SubjectName:string;
-  SubjectSiteResourcesUrl:string;
+export interface AssignmentDataItemProps{
+  itemData:AssignmentData;
+  teamName:string;
+  subject:string;
+  course:string;
 }
 
-export interface IExampleItem {
-  thumbnail: string;
-  name: string;
-  description: string;
-  color: string;
-  shape: string;
-  location: string;
-  width: number;
-  height: number;
-}
 export interface IMyAssignmentsWebPartProps {
   pagingValue:number;
   subjectFilter:boolean;
   hideOverDue:boolean;
+  showArchivedTeams:boolean;
 }
 
 
