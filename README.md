@@ -12,7 +12,7 @@ The latest downloadable release is available here (https://github.com/CloudDesig
 
 ## About Cloud Design Box
 <a href="https://www.clouddesignbox.co.uk"><img src="https://www.clouddesignbox.co.uk/static/logo-493bd038d15459f400d201177233a0d6.svg" style="width:200px;height:auto" /></a>
-We help schools Achieve more by extending Teams, SharePoint and Microsoft 365 with the Cloud Box education solutions. We have lots of free community resources on our blog and website (https://www.clouddesignbox.co.uk/)
+<p>We help schools Achieve more by extending Teams, SharePoint and Microsoft 365 with the Cloud Box education solutions. We have lots of free community resources on our blog and website (https://www.clouddesignbox.co.uk/)</p>
 
 ## Prerequisites
 This can only be used in a Microsoft Education tenant using Microsoft School Data Sync to setup classes and memberships.
