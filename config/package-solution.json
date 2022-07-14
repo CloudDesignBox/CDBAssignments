@@ -24,18 +24,18 @@
       }
     ],
     "developer": {
-      "name": "",
-      "websiteUrl": "",
-      "privacyUrl": "",
-      "termsOfUseUrl": "",
-      "mpnId": "Undefined-1.14.0"
+      "name": "Cloud Design Box",
+      "websiteUrl": "https://www.clouddesignbox.co.uk",
+      "privacyUrl": "https://www.clouddesignbox.co.uk",
+      "termsOfUseUrl": "https://www.clouddesignbox.co.uk",
+      "mpnId": "4596806"
     },
     "metadata": {
       "shortDescription": {
-        "default": "CDB My Assignments Web Part description"
+        "default": "CDB My Assignments Web Part solution"
       },
       "longDescription": {
-        "default": "CDB My Assignments Web Part description"
+        "default": "CDB My Assignments Web Part solution"
       },
       "screenshotPaths": [],
       "videoUrl": "",

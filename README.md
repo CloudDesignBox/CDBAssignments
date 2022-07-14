@@ -2,7 +2,7 @@
 
 ## Summary
 
-Short summary on functionality and used technologies.
+Web Part which shows Microsoft Teams Education Assignments aggregated in SharePoint. Please note this requires Microsoft School Data Sync properties to be set including: Classes, Courses (optional to show course info), primary role of users (teacher or student). If you require assistance setting up School Data Sync or want to find out more about Cloud Design Box education solutions, visit our website (https://www.clouddesignbox.co.uk)
 
 [picture of the solution in action, if possible]
 
@@ -25,7 +25,7 @@ Short summary on functionality and used technologies.
 
 Solution|Author(s)
 --------|---------
-folder name | Author details (name, company, twitter alias with link)
+My Assignment web part|Tony Phillips (Cloud Design Box Ltd)
 
 ## Version history
 
