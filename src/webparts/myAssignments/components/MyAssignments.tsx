@@ -22,8 +22,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       student:false,
       refreshTime:this.helperFunctions.getTimeNow(),
       currentPage:1,
-      errorCode:"",
-      filteredSubject:""
+      errorCode:""
      };
 
      this.refreshData = this.refreshData.bind(this);
@@ -73,7 +72,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     this.loadedCourses=false;
     this.loadedUserType=false;
     this.CDBcachingService.removeCache(`${this.cacheKey()}Assignments`);
-    this.CDBcachingService.removeCache(`${this.cacheKey()}filteredSubject`);
     console.log("cache cleared");
     //update state
     this.setState({
@@ -82,8 +80,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       courses:courses,
       student:student,
       refreshTime:"Loading",
-      currentPage:1,
-      filteredSubject:""
+      currentPage:1
     });
   }
 
@@ -95,7 +92,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     let courses=[];
     let student=false;
     let refreshTime="";
-    let filteredSubject:string="";
     //check 
     if(this.CDBcachingService.getWithExpiry(`${this.cacheKey()}User`)){
       console.info("cached user loaded");
@@ -120,18 +116,14 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       console.info("cached time loaded");
       refreshTime=this.CDBcachingService.getWithExpiry(`${this.cacheKey()}Time`);
     }
-    if(this.CDBcachingService.getWithExpiry(`${this.cacheKey()}filteredSubject`)){
-      console.info("cached filteredSubject loaded");
-      filteredSubject=this.CDBcachingService.getWithExpiry(`${this.cacheKey()}filteredSubject`);
-    }
+
       //update state
       this.setState({
         assignments:assignments,
         teams:teams,
         courses:courses,
         student:student,
-        refreshTime:refreshTime,
-        filteredSubject:filteredSubject
+        refreshTime:refreshTime
       });
 
   }
@@ -464,7 +456,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     return (
       <div className={ styles.myAssignments } style={{backgroundColor: semanticColors.bodyBackground}}>
         <section id="cdb-my-assignments">
-          <div className={styles.header}>My Assignments {this.state.filteredSubject && <span>for {this.state.filteredSubject}</span>}</div>
+          <div className={styles.header}>My Assignments</div>
           <div className={styles.warningbox}>{warning}</div>
           <Icon iconName="Refresh" onClick={this.refreshData}  className={styles.refreshicon}/>
           <span className={styles.refreshtext}>&nbsp;&nbsp;Last updated: {this.state.refreshTime}</span>
