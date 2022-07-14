@@ -1,4 +1,4 @@
-# cdb-my-assignments-web-part
+# My Assignments Web Part by Cloud Design Box
 
 ## Summary
 
