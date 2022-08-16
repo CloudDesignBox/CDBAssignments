@@ -1,11 +1,6 @@
 @import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
 @import './themes.module.scss';
 
-// :global{
-//   /* fix for scrolling on fabric dialog */
-//   .ms-Dialog-actionsRight{margin-right:0px!important;padding:20px;}
-// }
-
 .myAssignments {
   .warningbox{
     color:grey;
@@ -101,7 +96,5 @@
     margin: 0px auto;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
   }
-
-
 
 }
