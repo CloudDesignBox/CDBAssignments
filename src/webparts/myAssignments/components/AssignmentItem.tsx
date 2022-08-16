@@ -17,8 +17,6 @@ export default class AssignmentItemDivV2 extends React.Component<AssignmentDataI
 
   private cleanDueDate:string="";
 
-
-
   private renderFriendlyDateFormat(datestring:string):string{
     let dateString:Date = new Date(datestring);
     const days = [
@@ -113,7 +111,6 @@ public render(): React.ReactElement<AssignmentDataItemProps> {
     // isArchived not returned?
     let classesForItem:string=`${styles.assignmentOuterBlock} cdbassignmentpage${this.props.itemData.currentPage.toString()}`;
   return (
-
     <div className={classesForItem}>
       <div onClick={this.openDetailsInDialog} className={styles.assignmentBlock}>
         <div className={styles.assignmentIcon}>{subjectInitials}</div>
@@ -125,8 +122,6 @@ public render(): React.ReactElement<AssignmentDataItemProps> {
       </div>
       <div className={styles.clear} />
     </div>
-
-        
   );
 }
 }

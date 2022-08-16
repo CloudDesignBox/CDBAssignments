@@ -1,7 +1,6 @@
 export class helperFunctions {
 
     constructor() {
-        
     }
 
     public getTimeNow():string{
@@ -17,9 +16,6 @@ export class helperFunctions {
         if(today.getMinutes())
         return today.getHours() + ":" + mins + ":" + sec;
       }
-
-
-
 
     public reportDebug(logmessage:string):void{
         let debugswitch:string = this.getParameterByName('cdbdebug');
@@ -37,6 +33,4 @@ export class helperFunctions {
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
-
-
 }

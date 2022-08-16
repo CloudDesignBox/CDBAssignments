@@ -1,18 +1,13 @@
 export class cachingService {
-
     private ttl:number = 0;
-
-
 
     constructor(ttl:number) {
         this.ttl=ttl;
     }
 
-
     public setWithGlobalExpiry(key, value) {
         const now = new Date();
         let ttl:number = this.ttl;
-    
         // `item` is an object which contains the original value
         // as well as the time when it's supposed to expire
         const item = {
@@ -30,9 +25,7 @@ export class cachingService {
     }
 
     public setWithExpiry(key, value, ttl) {
-
         const now = new Date();
-    
         // `item` is an object which contains the original value
         // as well as the time when it's supposed to expire
         const item = {
@@ -50,7 +43,6 @@ export class cachingService {
     }
 
     public getWithExpiry(key) {
-
         const itemStr = localStorage.getItem(key);
         // if the item doesn't exist, return null
         if (!itemStr) {
@@ -69,7 +61,6 @@ export class cachingService {
     }
 
     public removeCache(key){
-
         localStorage.removeItem(key);
     }
 
@@ -87,6 +78,4 @@ export class cachingService {
         }
         console.log("finished clearing local storage");
     }
-
-
 }

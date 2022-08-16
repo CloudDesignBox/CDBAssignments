@@ -24,7 +24,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       currentPage:1,
       errorCode:""
      };
-
      this.refreshData = this.refreshData.bind(this);
      this.updatePaging = this.updatePaging.bind(this);
   }
@@ -53,8 +52,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     this.setPagingStyle();
   }
 
-
-
   //call from refresh button
   private refreshData(){
     this.cacheCheck=true;
@@ -62,7 +59,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     let teams=[];
     let courses=[];
     let student=false;
-    
     //check 
     this.CDBcachingService.removeCache(`${this.cacheKey()}User`);
     this.CDBcachingService.removeCache(`${this.cacheKey()}Teams`);
@@ -84,7 +80,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     });
   }
 
-  
   private checkCache(){
     this.cacheCheck=true;
     let assignments=[];
@@ -116,7 +111,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       console.info("cached time loaded");
       refreshTime=this.CDBcachingService.getWithExpiry(`${this.cacheKey()}Time`);
     }
-
       //update state
       this.setState({
         assignments:assignments,
@@ -125,7 +119,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
         student:student,
         refreshTime:refreshTime
       });
-
   }
 
 
@@ -189,7 +182,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
           }
         });
       });
-
   }
 
   private getCoursesForMe(){
@@ -220,11 +212,9 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
           }
         });
       });
-
   }
 
   private getAssignmentsForMe(){
-
     this.props.context.msGraphClientFactory.getClient()
     .then((client2: MSGraphClient) => {
       client2
@@ -314,9 +304,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     return sortedAndCleanedData;
   }
 
-  
-
-
   private updatePaging(e){
     e.preventDefault();
     let pageNumber:number = parseInt(e.target.getAttribute("data-pagenumber"));
@@ -340,14 +327,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       }
     });
   }
-
-
-
-
-
-
-
-
 
 
 ///RENDER------
@@ -389,7 +368,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
       pagingProp=this.props.webPartProps.pagingValue;
     }
 
-
     const listv2 = [];
     let pageCounter:number=1;
     let currentPage:number=1;
@@ -423,7 +401,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
         if((this.props.webPartProps.hideOverDue && assignment.studentSubmissionDateStatus != "overdue")||!this.props.webPartProps.hideOverDue){
           //only show archived teams
           if((this.props.webPartProps.showArchivedTeams && archivedState) || !archivedState){
-
             //need to remove archived teams
             if(this.state.currentPage==currentPage){
               listv2.push(<AssignmentItemDivV2 itemData={assignment} teamName={teamName} course={courseName} subject={subject} />);
@@ -436,7 +413,6 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
             }else{
               pageCounter++;
             }
-
           }
         }
       });
