@@ -53,8 +53,10 @@ Version|Date|Comments
 - Clone this repository
 - Ensure that you are at the solution folder
 - in the command-line run:
+  - nvm use 14.15.0 (ensure you have this version installed)
   - **npm install**
   - **gulp serve**
+- ?debug=true&noredir=true&debugManifestsFile=https%3A%2F%2Flocalhost%3A4321%2Ftemp%2Fmanifests.js&Mode=Edit
 
 ## References
 
