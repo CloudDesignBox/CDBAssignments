@@ -6,9 +6,9 @@ import * as cachingService from "../../../services/cachingService";
 import * as helperFunctions from "../../../services/helperFunctions";
 import AssignmentItemDivV2 from "./AssignmentItem";
 import * as MicrosoftGraph from '@microsoft/microsoft-graph-types';
-import { MSGraphClient, } from "@microsoft/sp-http";
+import { MSGraphClientV3, } from "@microsoft/sp-http";
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
-//theme 
+//theme
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
 
 export default class MyAssignments extends React.Component<IMyAssignmentsProps, IMyAssignmentsState> {
@@ -59,7 +59,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     let teams=[];
     let courses=[];
     let student=false;
-    //check 
+    //check
     this.CDBcachingService.removeCache(`${this.cacheKey()}User`);
     this.CDBcachingService.removeCache(`${this.cacheKey()}Teams`);
     this.CDBcachingService.removeCache(`${this.cacheKey()}Courses`);
@@ -87,7 +87,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     let courses=[];
     let student=false;
     let refreshTime="";
-    //check 
+    //check
     if(this.CDBcachingService.getWithExpiry(`${this.cacheKey()}User`)){
       console.info("cached user loaded");
       student=this.CDBcachingService.getWithExpiry(`${this.cacheKey()}User`);
@@ -123,8 +123,8 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
 
 
   private getUserSDSType(){
-    this.props.context.msGraphClientFactory.getClient()
-    .then((client: MSGraphClient) => {
+    this.props.context.msGraphClientFactory.getClient('3')
+    .then((client: MSGraphClientV3) => {
       client
         .api(`/education/me`)
         .version("v1.0")
@@ -134,7 +134,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
             let user:MicrosoftGraph.EducationUser= res;
             if (user.primaryRole =="student"){
               this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}User`,true);
-              this.setState({ 
+              this.setState({
                 student:true
               });
             }else{
@@ -145,7 +145,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
             console.log("graph error "+err);
             //not sure this works
             if(err.toString().indexOf("InteractionRequiredAuthError")!=-1){
-              this.setState({ 
+              this.setState({
                 errorCode:`Warning - To use this web part, your SharePoint admin must accept the graph API permissions in the SharePoint admin centre https://${window.location.host.split(".")[0]}-admin.sharepoint.com/_layouts/15/online/AdminHome.aspx#/webApiPermissionManagement. Please log a support ticket with Cloud Design Box if you need further assistance.`
               });
             }
@@ -156,10 +156,10 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
 
 
   private getTeamsForMe(){
-    //GET 
+    //GET
     //then match up via ids in items
-    this.props.context.msGraphClientFactory.getClient()
-    .then((client2: MSGraphClient) => {
+    this.props.context.msGraphClientFactory.getClient('3')
+    .then((client2: MSGraphClientV3) => {
       client2
         .api(`/me/joinedTeams`)
         .select("displayName,id,isArchived")
@@ -168,14 +168,14 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
           if(res2){
             let teams:MicrosoftGraph.Team[]= res2.value;
             this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Teams`,teams);
-              this.setState({ 
+              this.setState({
                 teams:teams
               });
           }else if(err2){
             console.log("graph error "+err2);
             //not sure this works
             if(err2.toString().indexOf("InteractionRequiredAuthError")!=-1){
-              this.setState({ 
+              this.setState({
                 errorCode:`Warning - To use this web part, your SharePoint admin must accept the graph API permissions in the SharePoint admin centre https://${window.location.host.split(".")[0]}-admin.sharepoint.com/_layouts/15/online/AdminHome.aspx#/webApiPermissionManagement. Please log a support ticket with Cloud Design Box if you need further assistance.`
               });
             }
@@ -185,10 +185,10 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   }
 
   private getCoursesForMe(){
-    //GET 
+    //GET
     //then match up via ids in items
-    this.props.context.msGraphClientFactory.getClient()
-    .then((client2: MSGraphClient) => {
+    this.props.context.msGraphClientFactory.getClient('3')
+    .then((client2: MSGraphClientV3) => {
       client2
         .api(`/education/me/classes`)
         .select("id,course,displayName")
@@ -198,14 +198,14 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
           if(res2){
             let courses:MicrosoftGraph.EducationClass[]= res2.value;
             this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Courses`,courses);
-              this.setState({ 
+              this.setState({
                 courses:courses
               });
           }else if(err2){
             console.log("graph error "+err2);
             //not sure this works
             if(err2.toString().indexOf("InteractionRequiredAuthError")!=-1){
-              this.setState({ 
+              this.setState({
                 errorCode:`Warning - To use this web part, your SharePoint admin must accept the graph API permissions in the SharePoint admin centre https://${window.location.host.split(".")[0]}-admin.sharepoint.com/_layouts/15/online/AdminHome.aspx#/webApiPermissionManagement. Please log a support ticket with Cloud Design Box if you need further assistance.`
               });
             }
@@ -215,8 +215,8 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   }
 
   private getAssignmentsForMe(){
-    this.props.context.msGraphClientFactory.getClient()
-    .then((client2: MSGraphClient) => {
+    this.props.context.msGraphClientFactory.getClient('3')
+    .then((client2: MSGraphClientV3) => {
       client2
         .api(`/education/me/assignments?$expand=submissions&$top=999`)
         .version("v1.0")
@@ -235,7 +235,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
             });
             this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Assignments`,tempAsssignment);
               this.CDBcachingService.setWithGlobalExpiry(`${this.cacheKey()}Time`,this.helperFunctions.getTimeNow());
-              this.setState({ 
+              this.setState({
                 assignments:tempAsssignment,
                 refreshTime:this.helperFunctions.getTimeNow()
               });
@@ -243,7 +243,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
             console.log("graph error "+err2);
             //not sure this works
             if(err2.toString().indexOf("InteractionRequiredAuthError")!=-1){
-              this.setState({ 
+              this.setState({
                 errorCode:`Warning - To use this web part, your SharePoint admin must accept the graph API permissions in the SharePoint admin centre https://${window.location.host.split(".")[0]}-admin.sharepoint.com/_layouts/15/online/AdminHome.aspx#/webApiPermissionManagement. Please log a support ticket with Cloud Design Box if you need further assistance.`
               });
             }
@@ -307,7 +307,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
   private updatePaging(e){
     e.preventDefault();
     let pageNumber:number = parseInt(e.target.getAttribute("data-pagenumber"));
-    this.setState({ 
+    this.setState({
       currentPage:pageNumber
     });
     return;
@@ -421,7 +421,7 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     }
 
     let warning:string="";
-   
+
     if(this.state.errorCode){
       warning+=this.state.errorCode;
     }
@@ -449,17 +449,3 @@ export default class MyAssignments extends React.Component<IMyAssignmentsProps, 
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
